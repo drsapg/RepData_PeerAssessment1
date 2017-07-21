@@ -1,25 +1,26 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "Liketomoveit.Rmd"
+author: "Santiago Patiño-Giraldo"
+date: "21/7/2017"
+output: html_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-## Loading and preprocessing the data
+# Movement Data Analysis
 
+This work will present the analysis for an anonymous subject about his/her daily
+movement activities.
 
+## Preparing the data
 
-## What is mean total number of steps taken per day?
+First, we need to unzip the dataset -if wasn't made previously-
 
+```{r}
+if(!file.exists("activity.csv")){
+        unzip(zipfile = "activity.zip")
+}
+```
 
-
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
