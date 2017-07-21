@@ -1,5 +1,4 @@
 ---
-title: "Liketomoveit.Rmd"
 author: "Santiago Patiño-Giraldo"
 date: "21/7/2017"
 output: html_document
@@ -9,12 +8,19 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Movement Data Analysis
+
 
 This work will present the analysis for an anonymous subject about his/her daily
 movement activities.
 
 ## Preparing the data
+
+A couple of packages for the work are loaded at first
+```{r results='hide'}
+library(lubridate)
+library(dplyr)
+library(xtable)
+```
 
 First, we need to unzip the dataset -if wasn't made previously-
 
@@ -24,3 +30,43 @@ if(!file.exists("activity.csv")){
 }
 ```
 
+Then, the data is loaded
+
+```{r}
+activity <- read.csv("activity.csv", header=TRUE)
+```
+
+It's important to check how the data is looking reviewing the head of dataset and
+the class of the columns
+```{r}
+head(activity)
+str(activity)
+```
+
+I'm not happy with the class of data, so, I will change them
+
+```{r}
+activity$date <- ymd(activity$date)
+activity$interval <- as.factor(activity$interval)
+```
+
+##What is mean total number of steps taken per day?
+
+To solve this question I group the data by date and then summarize the mean
+```{r}
+meansteps <- group_by(activity[complete.cases(activity),],date) %>% 
+                summarize(daily.steps=sum(steps),
+                mean_day=mean(steps,na.rm = TRUE),
+                median.day=median(steps))
+htmltable <- xtable(meansteps)
+```
+
+And the histogram of the total steps
+
+```{r fig.align='center'}
+hist(meansteps$daily.steps, main="Histogram of Mean Steps", ylim=c(0,30), xlab = "Mean steps by day", col=2)
+```
+###Summary of data
+```{r results='asis'}
+print(htmltable, type="html")
+```
