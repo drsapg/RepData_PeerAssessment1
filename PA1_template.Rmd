@@ -85,3 +85,46 @@ abline(h = mean(intervalsteps$mean), col=2)
 intervalsteps[intervalsteps$mean==max(intervalsteps$mean),]
 ```
 That's means that the max average of steps is during the 8:35 interval
+
+##Imputing missing values
+**How many NA's we have**
+```{r}
+sum(is.na(activity$steps))
+```
+It's better as percentage
+```{r}
+sum(is.na(activity$steps))/nrow(activity)
+```
+We have a 13% missing values
+
+**Imputate**
+
+In this step, I will imputate the mean of the interval assigned to the missing data using function impute
+```{r}
+impute <- function (x)
+{
+        if(is.na(x[1])){
+        ##Mean of the interval
+        intmean <- intervalsteps[intervalsteps$interval==x[3],]
+        
+        x[1] <- round(intmean$mean,2)
+        }
+        x
+}
+```
+Now, I create the new data.frame
+```{r}
+complete_activity <- apply(activity,1,impute)
+complete_activity <- t(complete_activity) # Transpose de new matrix
+complete_activity <- tbl_df(complete_activity) # Convert to a data.frame
+
+# Change classes
+complete_activity$steps <- as.integer(complete_activity$steps) 
+complete_activity$date <- ymd(complete_activity$date)
+complete_activity$interval <- as.factor(complete_activity$interval)
+str(complete_activity)
+```
+Verify NA's in the new dataframe
+```{r}
+sum(is.na(complete_activity))
+```
