@@ -64,9 +64,24 @@ htmltable <- xtable(meansteps)
 And the histogram of the total steps
 
 ```{r fig.align='center'}
-hist(meansteps$daily.steps, main="Histogram of Mean Steps", ylim=c(0,30), xlab = "Mean steps by day", col=2)
+hist(meansteps$daily.steps, main="Histogram of Mean Steps", ylim=c(0,30), 
+     xlab = "Mean steps by day", col=2)
 ```
-###Summary of data
+**Summary of data**
 ```{r results='asis'}
 print(htmltable, type="html")
 ```
+
+##What is the average daily activity pattern?
+```{r fig.align='center', fig.height=5, fig.width=8}
+intervalsteps <- group_by(activity[complete.cases(activity),],interval) %>% 
+                summarize(mean=mean(steps,na.rm = TRUE))
+with(intervalsteps, plot(interval,mean, type="b", main="Average steps by 5-min daily intervals"), 
+     ylab="Average steps", xlab="5-min time interval")
+abline(h = mean(intervalsteps$mean), col=2)
+```
+**Now we subset the max value interval**
+```{r}
+intervalsteps[intervalsteps$mean==max(intervalsteps$mean),]
+```
+That's means that the max average of steps is during the 8:35 interval
