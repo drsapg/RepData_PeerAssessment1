@@ -39,7 +39,6 @@ activity <- read.csv("activity.csv", header=TRUE)
 It's important to check how the data is looking reviewing the head of dataset and
 the class of the columns
 ```{r}
-head(activity)
 str(activity)
 ```
 
@@ -70,6 +69,12 @@ hist(meansteps$daily.steps, main="Histogram of Mean Steps", ylim=c(0,30),
 **Summary of data**
 ```{r results='asis'}
 print(htmltable, type="html")
+```
+
+**Table**
+
+```{r}
+summary(meansteps)
 ```
 
 ##What is the average daily activity pattern?
@@ -128,3 +133,67 @@ Verify NA's in the new dataframe
 ```{r}
 sum(is.na(complete_activity))
 ```
+
+**New histogram**
+
+```{r}
+complete_meansteps <- group_by(complete_activity,date) %>% 
+                summarize(daily.steps=sum(steps),
+                mean_day=mean(steps,na.rm = TRUE),
+                median.day=median(steps))
+htmltable2 <- xtable(complete_meansteps)
+
+meansteps$class <- "raw"
+complete_meansteps$class <- "complete"
+
+allcases <- rbind(meansteps,complete_meansteps)
+
+library(ggplot2)
+ggplot(allcases, aes(daily.steps, fill = class)) + geom_density(alpha = 0.2) +
+        geom_vline(aes(xintercept = mean(meansteps$daily.steps)), colour="green") +
+        geom_vline(aes(xintercept = mean(complete_meansteps$daily.steps)), colour="red")
+
+```
+
+**Answer:** Data didn't differ with or without the NA's
+
+```{r results='asis'}
+print(htmltable2, type="html")
+```
+
+**Table**
+
+```{r}
+summary(complete_meansteps)
+```
+
+##Are there differences in activity patterns between weekdays and weekends?
+
+I will work with the impute dataset
+
+```{r}
+# Create the new column
+complete_activity <- mutate(complete_activity,weekday=weekdays(complete_activity$date))
+
+# Reassing the levels
+for(i in 1:nrow(complete_activity)){
+        if(complete_activity[i,"weekday"]=="Saturday" | complete_activity[i,"weekday"]=="Sunday"){
+                complete_activity[i,"week"] <- "weekend"
+        }else{
+                complete_activity[i,"week"] <- "weekday"
+        }
+}
+
+#weekday points
+weekday_int <- filter(complete_activity, week=="weekday") %>%
+                group_by(interval) %>% 
+                summarize(mean=mean(steps,na.rm = TRUE))
+with(weekday_int, plot(interval,mean, type="b", main="Average steps by 5-min daily intervals"), 
+     ylab="Average steps", xlab="5-min time interval")
+abline(h = mean(weekday_int$mean), col=2)
+
+#Weekend points
+weekend_int <- filter(complete_activity, week=="weekend") %>%
+                group_by(interval) %>% 
+                summarize(mean=mean(steps,na.rm = TRUE))
+with(weekend_int, points(interval,mean, type="b", col=3)
