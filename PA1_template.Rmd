@@ -79,10 +79,9 @@ summary(meansteps)
 
 ##What is the average daily activity pattern?
 ```{r fig.align='center', fig.height=5, fig.width=8}
-intervalsteps <- group_by(activity[complete.cases(activity),],interval) %>% 
-                summarize(mean=mean(steps,na.rm = TRUE))
-with(intervalsteps, plot(interval,mean, type="b", main="Average steps by 5-min daily intervals"), 
-     ylab="Average steps", xlab="5-min time interval")
+intervalsteps <- group_by(activity[complete.cases(activity),],interval) %>% summarize(mean=mean(steps,na.rm = TRUE))
+with(intervalsteps, plot(as.numeric(interval),mean, type="l", main="Average steps by 5-min daily intervals"), 
+     ylab="Average steps", xlab="5-min time interval", pch=20)
 abline(h = mean(intervalsteps$mean), col=2)
 ```
 **Now we subset the max value interval**
@@ -188,7 +187,7 @@ for(i in 1:nrow(complete_activity)){
 weekday_int <- filter(complete_activity, week=="weekday") %>%
                 group_by(interval) %>% 
                 summarize(mean=mean(steps,na.rm = TRUE))
-with(weekday_int, plot(interval,mean, type="b",  pch=".", col=1, main="Average steps by 5-min daily intervals"),
+with(weekday_int, plot(as.numeric(interval),mean, type="l",  pch=".", col=1, main="Average steps by 5-min daily intervals"),
      ylab="Average steps", xlab="5-min time interval")
 abline(h = mean(weekday_int$mean), col=1)
 
@@ -196,7 +195,7 @@ abline(h = mean(weekday_int$mean), col=1)
 weekend_end <- filter(complete_activity, week=="weekend") %>%
                 group_by(interval) %>% 
                 summarize(mean=mean(steps,na.rm = TRUE))
-with(weekend_end, points(interval,mean, type="b", pch=".", col=3))
+with(weekend_end, points(as.numeric(interval),mean, type="l", pch=".", col=3))
 abline(h = mean(weekend_end$mean), col=3)
 legend("topleft",legend = c("Weekday","Weekend"),col=c(1,3),pch=20, cex=0.8)
 ```
